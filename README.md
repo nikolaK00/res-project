@@ -1,2 +1,2 @@
 # res-project
-#gde da vidim clanove?
+gde da vidim clanove?
