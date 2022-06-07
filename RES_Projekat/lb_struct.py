@@ -1,3 +1,7 @@
+import time
+from random import  randint
+from load_balancer import LoadBalancer
+
 class LbStruct:
     def __init__(self, item, description, listadescr):
         self.item = item
@@ -19,3 +23,14 @@ class Description:
 class ListaDescriptiona:
     def __init__(self, descriptions):
         self.descriptions = descriptions
+        
+class Writer:
+    @staticmethod
+    def RunDataSending():
+        while True:
+            time.sleep(2)
+            code = randint(0, 7)
+            value = randint(1, 10000)
+            new_item = Item(code, value)
+            LoadBalanser.LB_Receiver(code,value)
+            
