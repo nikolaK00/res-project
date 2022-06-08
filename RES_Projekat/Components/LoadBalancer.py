@@ -22,3 +22,28 @@ class LoadBalancer:
             if data.code in dataset:
                 return dataset_id
             dataset_id += 1
+
+    @staticmethod
+    def __GenerateWorkerId():
+        new_worker_id = 1
+        for worker in LoadBalancer.workers.values():
+            if worker.id >= new_worker_id:
+                new_worker_id = worker.id + 1
+
+        return new_worker_id
+
+    @staticmethod
+    def TurnOnNewWorker(amount):
+        for _ in range(amount):
+            new_worker_id = LoadBalancer.__GenerateWorkerId()
+            LoadBalancer.workers[new_worker_id] = Worker(new_worker_id)
+            LoadBalancer.worker_statuses[new_worker_id] = 'On'
+
+    @staticmethod
+    def TurnOffExistingWorker(worker_name):
+        wanted_worker_id = None
+        for worker in LoadBalancer.workers.values():
+            if worker.__str__() == worker_name:
+                wanted_worker_id = worker.id
+
+        LoadBalancer.worker_statuses[wanted_worker_id] = 'Off'
