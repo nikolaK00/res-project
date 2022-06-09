@@ -15,7 +15,7 @@ class LoadBalancer:
     ]
     workers = {}
     worker_statuses = {}
-    last_used_worker_id = 0
+    last_used_worker_id = 1
 
     @staticmethod
     def ReceiveData(item):
@@ -29,6 +29,8 @@ class LoadBalancer:
             if data.code in dataset:
                 return dataset_id
             dataset_id += 1
+
+        return dataset_id - 1
 
     @staticmethod
     def __GenerateWorkerId():
