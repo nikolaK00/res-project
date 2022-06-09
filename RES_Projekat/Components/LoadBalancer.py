@@ -7,6 +7,12 @@ from Models.Description import Description
 
 
 class LoadBalancer:
+    buffer = [
+        Description(id=0, items=[], dataset=DATASETS[0]),
+        Description(id=1, items=[], dataset=DATASETS[1]),
+        Description(id=2, items=[], dataset=DATASETS[2]),
+        Description(id=3, items=[], dataset=DATASETS[3])
+    ]
     workers = {}
     worker_statuses = {}
     last_used_worker_id = 0
@@ -14,6 +20,7 @@ class LoadBalancer:
     @staticmethod
     def ReceiveData(item):
         dataset_id = LoadBalancer.__IdentifyDataset(item)
+        LoadBalancer.buffer[dataset_id].items.append(item)
 
     @staticmethod
     def __IdentifyDataset(data):
