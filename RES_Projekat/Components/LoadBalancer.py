@@ -9,11 +9,8 @@ from Models.Description import Description
 class LoadBalancer:
     buffer = [
         Description(id=0, items=[], dataset=DATASETS[0]),
-
         Description(id=1, items=[], dataset=DATASETS[1]),
-
         Description(id=2, items=[], dataset=DATASETS[2]),
-
         Description(id=3, items=[], dataset=DATASETS[3])
     ]
     workers = {}
