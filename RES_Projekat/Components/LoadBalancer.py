@@ -1,6 +1,8 @@
 import threading
 import time
+from random import randint
 
+import config
 from Components.Worker import Worker
 from Constants.DataSets import DATASETS
 from Models.Description import Description
@@ -57,51 +59,67 @@ class LoadBalancer:
 
         LoadBalancer.worker_statuses[wanted_worker_id] = 'Off'
 
-        @staticmethod
-        def ForwardData():
-
+    @staticmethod
+    def ForwardData():
+        while config.RUN_THREADS:
+            time.sleep(0.5)
             for description in LoadBalancer.buffer:
                 if len(description.items) <= 0:
                     continue
 
+                package = LoadBalancer.__PackageData(description)
                 worker = LoadBalancer.__GetAvailableWorker()
                 worker_processing_thread = threading.Thread(target=worker.ProcessData, args=(description,))
                 worker_processing_thread.start()
+                if config.LOGGER_ACTIVE:
+                    print(f'[LOAD BALANCER]: Prompted {worker} to process data')
 
-        @staticmethod
-        def __GetAvailableWorker():
-            while True:
-                active_workers = [worker for worker in LoadBalancer.workers.values() if
-                                  LoadBalancer.worker_statuses[worker.id] == 'On']
+    @staticmethod
+    def __PackageData(description):
+        package_items = []
+        for item in description.items:
+            package_items.append(item)
+        description.items.clear()
+        package = Description(description.id, package_items, description.dataset)
+        return  package
 
-                # If there is only one available worker, return it
-                if len(active_workers) == 1:
-                    if active_workers[0].is_available:
-                        return active_workers[0]
+    @staticmethod
+    def __GetAvailableWorker():
+        while True:
+            active_workers = [worker for worker in LoadBalancer.workers.values() if
+                              LoadBalancer.worker_statuses[worker.id] == 'On']
 
-                # Get next worker once it is available
-                wanted_worker_id = LoadBalancer.__GetNextWorkerId()
-                for worker in active_workers:
-                    if worker.id == wanted_worker_id and worker.is_available:
-                        LoadBalancer.last_used_worker_id = worker.id
-                        return worker
+            # If there is only one available worker, return it
+            if len(active_workers) == 1:
+                if active_workers[0].is_available:
+                    return active_workers[0]
 
-                time.sleep(0.5)
+            # Get next worker once it is available
+            wanted_worker_id = LoadBalancer.__GetNextWorkerId()
+            for worker in active_workers:
+                if worker.id == wanted_worker_id and worker.is_available:
+                    LoadBalancer.last_used_worker_id = worker.id
+                    return worker
 
-        @staticmethod
-        def __GetNextWorkerId():
-            index = 0
-            active_workers_ids = [worker.id for worker in LoadBalancer.workers.values() if
-                                  LoadBalancer.worker_statuses[worker.id] == 'On']
-            for worker_id in active_workers_ids:
-                if worker_id == LoadBalancer.last_used_worker_id:
-                    return active_workers_ids[index + 1]
-                index += 1
-
-            if len(active_workers_ids) == 0:
-                LoadBalancer.last_used_worker_id += 1
-            else:
-                random_worker_id = randint(0, len(active_workers_ids) - 1)
-                LoadBalancer.last_used_worker_id = active_workers_ids[random_worker_id]
             time.sleep(0.5)
-            return LoadBalancer.__GetNextWorkerId()
+
+    @staticmethod
+    def __GetNextWorkerId():
+        index = 0
+        active_workers_ids = [worker.id for worker in LoadBalancer.workers.values() if
+                              LoadBalancer.worker_statuses[worker.id] == 'On']
+        for worker_id in active_workers_ids:
+            if worker_id == LoadBalancer.last_used_worker_id:
+                try:
+                    return  active_workers_ids[index + 1]
+                except:
+                    return active_workers_ids[0]
+            index += 1
+
+        if len(active_workers_ids) == 0:
+            LoadBalancer.last_used_worker_id += 1
+        else:
+            random_worker_id = randint(0, len(active_workers_ids) - 1)
+            LoadBalancer.last_used_worker_id = active_workers_ids[random_worker_id]
+        time.sleep(0.5)
+        return LoadBalancer.__GetNextWorkerId()
