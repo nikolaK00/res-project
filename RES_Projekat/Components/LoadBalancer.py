@@ -97,3 +97,11 @@ class LoadBalancer:
                 if worker_id == LoadBalancer.last_used_worker_id:
                     return active_workers_ids[index + 1]
                 index += 1
+
+            if len(active_workers_ids) == 0:
+                LoadBalancer.last_used_worker_id += 1
+            else:
+                random_worker_id = randint(0, len(active_workers_ids) - 1)
+                LoadBalancer.last_used_worker_id = active_workers_ids[random_worker_id]
+            time.sleep(0.5)
+            return LoadBalancer.__GetNextWorkerId()
