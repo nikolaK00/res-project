@@ -15,8 +15,8 @@ class LoadBalancer:
         Description(id=2, items=[], dataset=DATASETS[2]),
         Description(id=3, items=[], dataset=DATASETS[3])
     ]
-    workers = {}
-    worker_statuses = {}
+    workers = {}  # { Worker.Id: Worker }
+    worker_statuses = {}  # { Worker.Id: Worker status(True/False) }
     last_used_worker_id = 1
 
     @staticmethod
@@ -32,44 +32,17 @@ class LoadBalancer:
                 return dataset_id
             dataset_id += 1
 
-        return dataset_id - 1
-
-    @staticmethod
-    def __GenerateWorkerId():
-        new_worker_id = 1
-        for worker in LoadBalancer.workers.values():
-            if worker.id >= new_worker_id:
-                new_worker_id = worker.id + 1
-
-        return new_worker_id
-
-    @staticmethod
-    def TurnOnNewWorker(amount):
-        for _ in range(amount):
-            new_worker_id = LoadBalancer.__GenerateWorkerId()
-            LoadBalancer.workers[new_worker_id] = Worker(new_worker_id)
-            LoadBalancer.worker_statuses[new_worker_id] = 'On'
-
-    @staticmethod
-    def TurnOffExistingWorker(worker_name):
-        wanted_worker_id = None
-        for worker in LoadBalancer.workers.values():
-            if worker.__str__() == worker_name:
-                wanted_worker_id = worker.id
-
-        LoadBalancer.worker_statuses[wanted_worker_id] = 'Off'
-
     @staticmethod
     def ForwardData():
         while config.RUN_THREADS:
             time.sleep(0.5)
             for description in LoadBalancer.buffer:
-                if len(description.items) <= 0:
+                if len(description.items) == 0:
                     continue
 
                 package = LoadBalancer.__PackageData(description)
                 worker = LoadBalancer.__GetAvailableWorker()
-                worker_processing_thread = threading.Thread(target=worker.ProcessData, args=(description,))
+                worker_processing_thread = threading.Thread(target=worker.ProcessData, args=(package,))
                 worker_processing_thread.start()
                 if config.LOGGER_ACTIVE:
                     print(f'[LOAD BALANCER]: Prompted {worker} to process data')
@@ -81,7 +54,7 @@ class LoadBalancer:
             package_items.append(item)
         description.items.clear()
         package = Description(description.id, package_items, description.dataset)
-        return  package
+        return package
 
     @staticmethod
     def __GetAvailableWorker():
@@ -91,13 +64,13 @@ class LoadBalancer:
 
             # If there is only one available worker, return it
             if len(active_workers) == 1:
-                if active_workers[0].is_available:
+                if active_workers[0].is_free:
                     return active_workers[0]
 
             # Get next worker once it is available
             wanted_worker_id = LoadBalancer.__GetNextWorkerId()
             for worker in active_workers:
-                if worker.id == wanted_worker_id and worker.is_available:
+                if worker.id == wanted_worker_id and worker.is_free:
                     LoadBalancer.last_used_worker_id = worker.id
                     return worker
 
@@ -111,7 +84,7 @@ class LoadBalancer:
         for worker_id in active_workers_ids:
             if worker_id == LoadBalancer.last_used_worker_id:
                 try:
-                    return  active_workers_ids[index + 1]
+                    return active_workers_ids[index + 1]
                 except:
                     return active_workers_ids[0]
             index += 1
@@ -123,3 +96,28 @@ class LoadBalancer:
             LoadBalancer.last_used_worker_id = active_workers_ids[random_worker_id]
         time.sleep(0.5)
         return LoadBalancer.__GetNextWorkerId()
+
+    @staticmethod
+    def TurnOnNewWorker(amount):
+        for _ in range(amount):
+            new_worker_id = LoadBalancer.__GenerateWorkerId()
+            LoadBalancer.workers[new_worker_id] = Worker(new_worker_id)
+            LoadBalancer.worker_statuses[new_worker_id] = 'On'
+
+    @staticmethod
+    def __GenerateWorkerId():
+        new_worker_id = 1
+        for worker in LoadBalancer.workers.values():
+            if worker.id >= new_worker_id:
+                new_worker_id = worker.id + 1
+
+        return new_worker_id
+
+    @staticmethod
+    def TurnOffExistingWorker(worker_name):
+        wanted_worker_id = None
+        for worker in LoadBalancer.workers.values():
+            if worker.__str__() == worker_name:
+                wanted_worker_id = worker.id
+
+        LoadBalancer.worker_statuses[wanted_worker_id] = 'Off'

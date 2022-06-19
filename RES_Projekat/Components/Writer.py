@@ -2,41 +2,28 @@ import os
 import time
 from random import randint
 
+from inquirer2 import prompt
+
+import config
 from Components.LoadBalancer import LoadBalancer
-from Constants.Codes import CODES
+from Constants.Codes import Code
 from Models.Item import Item
 
 
 class Writer:
     @staticmethod
     def RunDataSending():
-        while True:
+        while config.RUN_THREADS:
             time.sleep(2)
-            code = CODES[randint(0, 7)]
+            code = Code(randint(1, 8))
             value = randint(1, 10000)
             new_item = Item(code, value)
             LoadBalancer.ReceiveData(new_item)
+            if config.LOGGER_ACTIVE:
+                print(f'[WRITER]:\t Send package\t{new_item}')
 
     @staticmethod
-    def Prompt():
-        while True:
-            os.system('cls' if os.name == 'nt' else 'clear')
-            questions = [
-                {
-                'type': 'list',
-                'name': 'input',
-                'message': 'Select action',
-                'choices': ['Turn on new workers', 'Turn off existing workers']
-                }
-            ]
-            answers = prompt.prompt(questions)
-            if answers['input'] == 'Turn on new workers':
-                Writer.__TurnOnWorkersPrompt()
-            elif answers['input'] == 'Turn off existing workers':
-                Writer.__TurnOffWorkersPrompt()
-
-    @staticmethod
-    def __TurnOnWorkersPrompt():
+    def TurnOnWorkersPrompt():
         os.system('cls' if os.name == 'nt' else 'clear')
         questions = [
             {
@@ -46,12 +33,11 @@ class Writer:
                 'validate': lambda x: True if Writer.__ValidateNumber(x) else 'Invalid'
             }
         ]
-
         answers = prompt.prompt(questions)
         LoadBalancer.TurnOnNewWorker(int(answers['amount']))
 
     @staticmethod
-    def __TurnOffWorkersPrompt():
+    def TurnOffWorkersPrompt():
         os.system('cls' if os.name == 'nt' else 'clear')
         choices = [{'name': worker.__str__()} for worker in LoadBalancer.workers.values() if
                    LoadBalancer.worker_statuses[worker.id] == 'On']
@@ -72,3 +58,18 @@ class Writer:
 
         for worker_name in answers['workers_to_turn_off']:
             LoadBalancer.TurnOffExistingWorker(worker_name)
+
+    @staticmethod
+    def ShowWorkerStatuses():
+        for worker in LoadBalancer.workers.values():
+            print(f'{worker}   {LoadBalancer.worker_statuses[worker.id]}')
+        input()
+
+    @staticmethod
+    def __ValidateNumber(value):
+        try:
+            if int(value) < 0:
+                return False
+        except:
+            return False
+        return True
