@@ -109,6 +109,25 @@ class Worker:
         con.close()
         lock.release()
 
+    def GetLatestValue(self, code):
+        while True:
+            try:
+                lock = threading.Lock()
+                lock.acquire()
+                con = sqlite3.connect('db.db')
+                cur = con.cursor()
+                dataset_id = self.IdentifyDatasetByCode(code)
+                query = f"""SELECT VALUE FROM DATASET{dataset_id} WHERE FORMATION_DATE = (SELECT MAX(FORMATION_DATE) FROM DATASET{dataset_id} WHERE CODE='{code.name}') AND CODE='{code.name}'"""
+                cur.execute(query)
+                result = cur.fetchone()
+                con.close()
+                lock.release()
+
+                if result is None:
+                    return None
+                return result[0]
+            except:
+                self.__CreateTables()
 
     def __ValidateDeadband(self, wp):
         if wp.code == Code.CODE_DIGITAL:
