@@ -42,7 +42,7 @@ class Worker:
         self.is_free = False
         self.__LoadData(data)
         self.__CheckForReadyData()
-        self.__ProcessData()
+        #self.__ProcessData()
         self.is_free = True
 
     def __LoadData(self, data):
