@@ -74,8 +74,32 @@ class Worker:
             else:
                 buffer_item[1] = False
 
-    def SaveData(self):
-        pass
+    @staticmethod
+    def __StoreDataInDatabase(wp, dataset_id):
+        lock = threading.Lock()
+        lock.acquire()
+        con = sqlite3.connect('db.db')
+        cur = con.cursor()
+        query = f"""INSERT INTO DATASET{dataset_id} (CODE, VALUE) values ('{wp.code.name}', {wp.worker_value})"""
+        cur.execute(query)
+        con.commit()
+        con.close()
+        lock.release()
+        
+    @staticmethod
+    def __CreateTables():
+        lock = threading.Lock()
+        lock.acquire()
+        con = sqlite3.connect('db.db')
+        cur = con.cursor()
+        for dataset_id in range(1, 5):
+            query = f"""CREATE TABLE DATASET{dataset_id} (CODE TEXT NOT NULL,
+                                                          VALUE INT NOT NULL,
+                                                          FORMATION_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                          CONSTRAINT DATASET{dataset_id}_CH CHECK (DATASET{dataset_id}.VALUE>=0))"""
+            cur.execute(query)
+        con.close()
+        lock.release()
 
     def __str__(self):
         return f'Worker {self.id}'
