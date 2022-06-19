@@ -34,17 +34,20 @@ class Worker:
             for result in results:
                 data.append(WorkerProperty(result[0], result[1]))
         return data
+
     def ProcessData(self, data):
         self.is_free = False
         self.__LoadData(data)
         self.__CheckForReadyData()
         #self.__ProcessData()  UNCOMMENT WHEN YOU IMPLEMENT IT!!!
         self.is_free = True
+
     def __LoadData(self, data):
         dataset_id = Worker.__IdentifyDatasetIndex(data)
         for item in data.items:
             wp = WorkerProperty(item.code, item.value)
             self.buffer[dataset_id][0].historical_collection.append(wp)
+            
     @staticmethod
     def __IdentifyDatasetIndex(data):
         dataset_id = 0
