@@ -78,9 +78,10 @@ class Worker:
         for buffer_item in self.buffer.values():
             if buffer_item[1]:
                 for wp in buffer_item[0].historical_collection:
-                    #irena,ovde proveriti deadband
-                    Worker.__StoreDataInDatabase(wp, buffer_item[0].id + 1)
+                    if self.__ValidateDeadband(wp):
+                        Worker.__StoreDataInDatabase(wp, buffer_item[0].id + 1)
                 buffer_item[0].historical_collection.clear()
+
     @staticmethod
     def __StoreDataInDatabase(wp, dataset_id):
         lock = threading.Lock()
@@ -107,6 +108,16 @@ class Worker:
             cur.execute(query)
         con.close()
         lock.release()
+
+
+    def __ValidateDeadband(self, wp):
+        if wp.code == Code.CODE_DIGITAL:
+            return True
+        latest_value = self.GetLatestValue(wp.code)
+        if latest_value is not None:
+            if abs(latest_value - wp.worker_value) <= (latest_value * 0.02):
+                return False
+        return True
 
     def IdentifyDatasetByCode(self, code):
             for id in range(0, 4):
