@@ -93,6 +93,8 @@ class Worker:
         con.commit()
         con.close()
         lock.release()
+        if config.LOGGER_ACTIVE:
+            print(f'[WORKER]:\t Saved data\t{wp}')
         
     @staticmethod
     def __CreateTables():
