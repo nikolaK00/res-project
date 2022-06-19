@@ -2,17 +2,19 @@ import sqlite3
 import threading
 
 import config
-from Models.CollectionDescription import CollectionDescription
+from Constants.Codes import Code
 from Constants.DataSets import DataSet, DATASETS
+from Models.CollectionDescription import CollectionDescription
 from Models.WorkerProperty import WorkerProperty
+
 
 class Worker:
     def __init__(self, id, status=False, is_free=True):
         self.buffer = {
-            0: [CollectionDescription(0, DataSet.Dataset_1, []), False],
-            1: [CollectionDescription(1, DataSet.Dataset_2, []), False],
-            2: [CollectionDescription(2, DataSet.Dataset_3, []), False],
-            3: [CollectionDescription(3, DataSet.Dataset_4, []), False]
+            0: [CollectionDescription(0, DataSet.DataSet_1, []), False],
+            1: [CollectionDescription(1, DataSet.DataSet_2, []), False],
+            2: [CollectionDescription(2, DataSet.DataSet_3, []), False],
+            3: [CollectionDescription(3, DataSet.DataSet_4, []), False]
         }
         self.id = id
         self.status = status
@@ -29,6 +31,7 @@ class Worker:
         results = cur.fetchall()
         con.close()
         lock.release()
+
         data = []
         if results is not None:
             for result in results:
@@ -39,7 +42,7 @@ class Worker:
         self.is_free = False
         self.__LoadData(data)
         self.__CheckForReadyData()
-        #self.__ProcessData()  UNCOMMENT WHEN YOU IMPLEMENT IT!!!
+        self.__ProcessData()
         self.is_free = True
 
     def __LoadData(self, data):
@@ -47,7 +50,7 @@ class Worker:
         for item in data.items:
             wp = WorkerProperty(item.code, item.value)
             self.buffer[dataset_id][0].historical_collection.append(wp)
-            
+
     @staticmethod
     def __IdentifyDatasetIndex(data):
         dataset_id = 0
