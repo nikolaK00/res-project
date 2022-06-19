@@ -74,6 +74,13 @@ class Worker:
             else:
                 buffer_item[1] = False
 
+    def __ProcessingData(self):
+        for buffer_item in self.buffer.values():
+            if buffer_item[1]:
+                for wp in buffer_item[0].historical_collection:
+                    #irena,ovde proveriti deadband
+                    Worker.__StoreDataInDatabase(wp, buffer_item[0].id + 1)
+                buffer_item[0].historical_collection.clear()
     @staticmethod
     def __StoreDataInDatabase(wp, dataset_id):
         lock = threading.Lock()
@@ -100,6 +107,11 @@ class Worker:
             cur.execute(query)
         con.close()
         lock.release()
+
+    def IdentifyDatasetByCode(self, code):
+            for id in range(0, 4):
+                if code in self.buffer[id][0].dataset.value:
+                    return id + 1
 
     def __str__(self):
         return f'Worker {self.id}'
