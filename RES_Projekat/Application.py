@@ -4,6 +4,7 @@ import threading
 from inquirer2 import prompt
 
 import config
+from Components.Reader import Reader
 from Components.LoadBalancer import LoadBalancer
 from Components.Writer import Writer
 
@@ -35,10 +36,10 @@ class Application:
             answers = prompt.prompt(questions)
             if answers['input'] == 'Show worker statues':
                 Writer.ShowWorkerStatuses()
-            #elif answers['input'] == 'Show last value by Code':
-             #   Reader.ShowLastValueByCode()
-            #elif answers['input'] == 'Show code values in a time interval':
-            #    Reader.ShowValuesByTimeInterval()
+            elif answers['input'] == 'Show last value by Code':
+                Reader.ShowLastValueByCode()
+            elif answers['input'] == 'Show code values in a time interval':
+                Reader.ShowValuesByTimeInterval()
             elif answers['input'] == 'Turn on new workers':
                 Writer.TurnOnWorkersPrompt()
             elif answers['input'] == 'Turn off existing workers':

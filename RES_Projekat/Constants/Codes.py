@@ -1,19 +1,19 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class Code(Enum):
-    CODE_ANALOG = 1
-    CODE_DIGITAL = 2
-    CODE_CUSTOM = 3
-    CODE_LIMITSET = 4
-    CODE_SINGLENOE = 5
-    CODE_MULTIPLENODE = 6
-    CODE_CONSUMER = 7
-    CODE_SOURCE = 8
+    CODE_ANALOG = auto()
+    CODE_DIGITAL = auto()
+    CODE_CUSTOM = auto()
+    CODE_LIMITSET = auto()
+    CODE_SINGLENOE = auto()
+    CODE_MULTIPLENODE = auto()
+    CODE_CONSUMER = auto()
+    CODE_SOURCE = auto()
 
     @classmethod
     def list(cls):
-        return list(map(lambda c: c.value, cls))
+        return list(map(lambda c: c.name, cls))
 
 
 CODES = Code.list()
