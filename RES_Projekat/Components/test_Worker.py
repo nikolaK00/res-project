@@ -3,8 +3,8 @@ from os import getcwd
 import unittest
 from unittest.mock import patch, Mock
 path.append(getcwd()[1:-17])
-from Components.Worker import Worker
-from Constants import DataSets
+from RES_Projekat.Components.Worker import Worker
+from RES_Projekat.Constants import DataSets
 
 
 class TestWorker(unittest.TestCase):

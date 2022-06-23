@@ -3,7 +3,7 @@ from os import getcwd
 import unittest
 from unittest.mock import patch, Mock, MagicMock
 
-from Components.Reader import Reader
+from RES_Projekat.Components.Reader import Reader
 
 path.append(getcwd()[1:-17])
 

@@ -3,7 +3,7 @@ from os import getcwd
 import unittest
 from unittest import mock
 path.append(getcwd()[1:-17])
-from Components.Writer import Writer
+from RES_Projekat.Components.Writer import Writer
 
 
 class TestWriter(unittest.TestCase):
