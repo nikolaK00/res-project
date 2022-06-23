@@ -1,11 +1,11 @@
 import sqlite3
 import threading
 
-import config
-from Constants.Codes import Code
-from Constants.DataSets import DataSet, DATASETS
-from Models.CollectionDescription import CollectionDescription
-from Models.WorkerProperty import WorkerProperty
+import RES_Projekat.config
+from RES_Projekat.Constants.Codes import Code
+from RES_Projekat.Constants.DataSets import DataSet, DATASETS
+from RES_Projekat.Models.CollectionDescription import CollectionDescription
+from RES_Projekat.Models.WorkerProperty import WorkerProperty
 
 
 class Worker:

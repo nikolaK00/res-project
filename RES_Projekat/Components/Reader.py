@@ -5,8 +5,8 @@ from datetime import datetime
 
 from inquirer2 import prompt
 
-from Components.Worker import Worker
-from Constants.Codes import CODES, Code
+from RES_Projekat.Components.Worker import Worker
+from RES_Projekat.Constants.Codes import CODES, Code
 
 
 class Reader:

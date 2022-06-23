@@ -4,10 +4,10 @@ from random import randint
 
 from inquirer2 import prompt
 
-import config
-from Components.LoadBalancer import LoadBalancer
-from Constants.Codes import Code
-from Models.Item import Item
+import RES_Projekat.config
+from RES_Projekat.Components.LoadBalancer import LoadBalancer
+from RES_Projekat.Constants.Codes import Code
+from RES_Projekat.Models.Item import Item
 
 
 class Writer:

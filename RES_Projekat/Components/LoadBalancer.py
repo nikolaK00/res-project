@@ -2,10 +2,10 @@ import threading
 import time
 from random import randint
 
-import config
-from Components.Worker import Worker
-from Constants.DataSets import DATASETS
-from Models.Description import Description
+import RES_Projekat.config
+from RES_Projekat.Components.Worker import Worker
+from RES_Projekat.Constants.DataSets import DATASETS
+from RES_Projekat.Models.Description import Description
 
 
 class LoadBalancer:
